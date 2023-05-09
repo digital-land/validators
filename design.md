@@ -13,7 +13,9 @@ Our inputs are
     1. Only header fields
 1. If the file as a whole has errors that will prevent further processing (Fatal)
     1. Blank `reference` fields. Report the line number and bail.
+1. `organisation` field makes sense. Lookup?
 1. Mandatory field other than `reference` missing reported per line (Error).
+
 
 ## Possible warnings
 

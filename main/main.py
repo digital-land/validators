@@ -22,10 +22,12 @@ def validate_endpoint():
     # Delete the temporary file
     os.remove(file_path)
     # Return the validation result as JSON
-    return jsonify(validation_result)
+    return validation_result
 
 if __name__ == '__main__':
     app.run()
+
+
 
 
 

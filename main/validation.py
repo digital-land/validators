@@ -39,8 +39,7 @@ def validate_csv(file_path):
                 response.append(additional_data.to_dict())
 
         if response is not None:
-             statusResponse = JsonResponse(status= 'FAILED')
-             statusResponse.add_error(response)
+             statusResponse = JsonResponse(status= 'FAILED', errors= response)
              return jsonify(statusResponse.to_dict()), 400
     
     

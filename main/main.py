@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import pandas as pd
 import validation
 import os
+import utils
 
 app = Flask(__name__)
 
@@ -12,12 +13,15 @@ def validate_endpoint():
         return jsonify({'error': 'No file provided.'}), 400
     
     file = request.files['file']
-   
-   # Save the file to a temporary location
+
+    # Save the file to a temporary location
     file_path = 'temp.csv'
     file.save(file_path)
+    extracted_file = utils.extract_data(file_path)
+
+
     # Validate the CSV data
-    validation_result = validation.validate_csv(file_path)
+    validation_result = validation.validate_csv(extracted_file)
     
     # Delete the temporary file
     os.remove(file_path)

@@ -15,11 +15,12 @@ class JsonResponse:
 
 
 class JsonError:
-    def __init__(self, errorCode, errorMessage, scope, level, rowNumber=None,  url=None):
+    def __init__(self, errorCode, errorMessage, scope, level, rowNumber=None, columnNames=None, url=None):
         self.errorCode = errorCode
         self.errorMessage = errorMessage
         self.level = level
         self.rowNumber = rowNumber
+        self.columnNames = columnNames
         self.scope = scope
         self.url = url
 
@@ -31,7 +32,7 @@ class JsonError:
             'errorMessage': self.errorMessage,
             'url': self.url,
         }
-        if self.scope == 'Field':
+        if self.scope == 'Field' or self.scope == 'Row':
             response['rowNumber'] = self.rowNumber
             response['columnNames'] = self.columnNames
         

@@ -17,15 +17,8 @@ async def validate_endpoint(file):
     # # Save the file to a temporary location
     # file_path = 'temp.csv'
     # file.save(file_path)
-    file.file.seek(0)
-    contents = file.file.read().decode("utf-8")
-    print('file::::::::::::',contents)
     file_path = utils.save_uploaded_file(file)
-    print(file_path)
-    file1 = open(file_path, "r")
-    print("Output of Read function is ")
-    print(file1.read())
-    print()
+    
     extracted_file = utils.extract_data(file_path)
 
 

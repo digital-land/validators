@@ -1,8 +1,7 @@
 import pandas as pd
 import os
-from flask import Flask, request, jsonify
-from validation_result import JsonResponse, JsonError
-
+import json
+from main.validation_result import JsonResponse, JsonError
 
 
 def validate_csv(file_path):
@@ -23,7 +22,7 @@ def validate_csv(file_path):
             )
             statusResponse = JsonResponse(status='FAILED')
             statusResponse.add_error(error.to_dict())
-            return jsonify(statusResponse.to_dict()), 400
+            return json.dumps(statusResponse.to_dict()), 400
         
         for index, row in data.iterrows():
             missing = row.isnull().tolist()
@@ -68,7 +67,7 @@ def validate_csv(file_path):
             status_response = JsonResponse(status='FAILED')
             for error in response:
                 status_response.add_error(error)
-            return jsonify(status_response.to_dict()), 400
+            return json.dumps(status_response.to_dict()), 400
     
     
    except pd.errors.EmptyDataError:
@@ -81,7 +80,7 @@ def validate_csv(file_path):
          )
        statusResponse = JsonResponse(status='FAILED')
        statusResponse.add_error(error.to_dict())
-       return jsonify(statusResponse.to_dict()), 400
+       return json.dumps(statusResponse.to_dict()), 400
    except Exception as e:
          error_message = 'Error occurred while checking CSV:', str(e)
          error = JsonError(
@@ -93,7 +92,7 @@ def validate_csv(file_path):
          )
          statusResponse = JsonResponse(status='FAILED')
          statusResponse.add_error(error.to_dict())
-         return jsonify(statusResponse.to_dict()), 400
+         return json.dumps(statusResponse.to_dict()), 400
 
 
 

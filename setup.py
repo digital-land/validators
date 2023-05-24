@@ -9,6 +9,5 @@ setup(
         'pandas',
         'Flask',
         'python-magic',
-        'cchardet',
     ],
 )

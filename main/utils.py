@@ -3,7 +3,8 @@ import csv
 import magic
 import pandas as pd
 import os
-from logger import get_logger
+from main.logger import get_logger
+import tempfile
 
 
 tmp_dir = None
@@ -80,3 +81,12 @@ def _get_sep(path):
         return b'/'
     else:
         return '/'
+    
+def save_uploaded_file(file):
+    temp_dir = tempfile.mkdtemp()
+    temp_file_path = os.path.join(temp_dir, file.filename)
+    file.file.seek(0)
+    #contents = file.file.read().decode("utf-8")
+    with open(temp_file_path, 'wb') as temp_file:
+        temp_file.write(file.file.read())
+    return temp_file_path

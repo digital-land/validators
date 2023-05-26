@@ -5,6 +5,8 @@ import pandas as pd
 import os
 from main.logger import get_logger
 import tempfile
+import hashlib
+
 
 
 tmp_dir = None
@@ -31,7 +33,8 @@ def looks_like_csv(file):
                 return False
             csv.Sniffer().sniff(content)
             return True
-    except Exception as e:  # noqa
+    except Exception as e:
+        logger.error("Exception occured while scanning the file: %s", str(e))  
         return False
 
 
@@ -57,7 +60,7 @@ def convert_to_csv(path):
         excel.to_csv(tmp_path, index=None, header=True)
         return tmp_path
 
-    logger.info(f"Unable to convert {path} from {media_type} to CSV")
+    logger.error(f"Unable to convert {path} from {media_type} to CSV")
     with open(tmp_path, 'w') as out:
         pass
     return tmp_path
@@ -83,10 +86,20 @@ def _get_sep(path):
         return '/'
     
 def save_uploaded_file(file):
-    temp_dir = tempfile.mkdtemp()
-    temp_file_path = os.path.join(temp_dir, file.filename)
-    file.file.seek(0)
-    #contents = file.file.read().decode("utf-8")
-    with open(temp_file_path, 'wb') as temp_file:
-        temp_file.write(file.file.read())
+    try:
+        temp_dir = tempfile.mkdtemp()
+        temp_file_path = os.path.join(temp_dir, file.filename)
+        file.file.seek(0)
+        with open(temp_file_path, 'wb') as temp_file:
+            temp_file.write(file.file.read())
+    except Exception as e:
+        logger.error("Unable to save file: %s", str(e))
     return temp_file_path
+
+def save_content(content):
+        temp_dir = tempfile.mkdtemp()
+        resource = hashlib.sha256(content).hexdigest()
+        path = os.path.join(temp_dir, resource)
+        with open(path, 'wb') as temp_file:
+            temp_file.write(content)
+        return resource

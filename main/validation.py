@@ -1,9 +1,15 @@
 import pandas as pd
 import os
 import json
-from main.validation_result import JsonResponse, JsonError
+from main.models.validation_result import JsonResponse, JsonError
 from shapely.geometry import Polygon, Point
-import pdb
+from shapely import wkt
+from main.logger import get_logger
+#import pdb
+#from specification import Specification
+
+
+logger = get_logger(__name__)
 
 # Define the polygon for the UK
 uk_polygon = Polygon([
@@ -17,10 +23,12 @@ uk_polygon = Polygon([
 
 def validate_csv(file_path):
    try:
-        response = []
+        # specification = Specification()
+        # mandatory_fields = specification.schema_field['conservation-area']
         
+        response = []
         statusResponse = JsonResponse()
-        # Load data from the CSV file
+       
         data = pd.read_csv(file_path,  index_col=False)
         
         #Checking if file only contains headers
@@ -37,17 +45,24 @@ def validate_csv(file_path):
             statusResponse.add_error(error.to_dict())
             return json.dumps(statusResponse.to_dict()), 400
         
-        #checking for null values
+
+        #headers = data.columns.tolist() 
+        # missing_headers = [header for header in mandatory_fields if header not in headers]
+        # print(missing_headers)
+        ### Iterating over the rows
         for index, row in data.iterrows():
             #pdb.set_trace()
 
-            # Check if the point falls within the UK geometry
+            ## Check if the point falls within the UK geometry
             # Remove the "POINT" prefix and parentheses
             point = row.Point.replace("POINT", "").strip()[1:-1]
-
             # Split the coordinates by space
             coordinates = point.split()
-            
+            # polygon = wkt.loads(row.Geometry)
+            # if polygon.within(uk_polygon):
+            #     print("yes it is")
+            # else:
+            #     print("No it is not")
             point = Point(float(coordinates[0]), float(coordinates[1]))
             is_within_uk = uk_polygon.contains(point)
             if not is_within_uk:
@@ -55,13 +70,13 @@ def validate_csv(file_path):
                         scope= 'Field',
                         level= 'Fatal',
                         errorCode= 'F003',
-                        errorMessage= 'Point is not within UK',
+                        errorMessage= 'Point is not within the UK',
                         url= 'demo',
                         rowNumber= index+1,
                         columnNames='Point')
                 response.append(additional_data.to_dict())
 
-                
+            #Checking for null values    
             missing = row.isnull().tolist()
             if any(missing):
                 missing_columns = [column for column, is_missing in zip(data.columns, missing) if is_missing]
@@ -87,7 +102,6 @@ def validate_csv(file_path):
                 duplicate_row = data.loc[index]
                 reference_value = duplicate_row[reference_column]
                 
-                # Create the error response
                 error = JsonError(
                     scope='Row',
                     level='Fatal',
@@ -120,7 +134,8 @@ def validate_csv(file_path):
        statusResponse.add_error(error.to_dict())
        return json.dumps(statusResponse.to_dict()), 400
    except Exception as e:
-         error_message = 'Error occurred while checking CSV:', str(e)
+         logger.error('Error occurred while checking CSV:%s', str(e))
+         error_message = 'Error occurred while checking CSV'
          error = JsonError(
           scope='File',
           level='Fatal',

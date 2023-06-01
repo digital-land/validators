@@ -1,8 +1,8 @@
 import pandas as pd
-import main.validation as validation
+import application.validation as validation
 import os
-import main.utils as utils
-from main.logger import get_logger
+import application.utils as utils
+from application.logger import get_logger
 
 logger = get_logger(__name__)
 

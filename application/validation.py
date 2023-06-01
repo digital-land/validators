@@ -1,12 +1,12 @@
 import pandas as pd
 import os
 import json
-from main.models.validation_result import JsonResponse, JsonError
+from application.models.validation_result import JsonResponse, JsonError
 from shapely.geometry import Polygon, Point
 from shapely import wkt
-from main.logger import get_logger
+from application.logger import get_logger
 #import pdb
-#from specification import Specification
+#from factory import Factory
 
 
 logger = get_logger(__name__)
@@ -23,8 +23,11 @@ uk_polygon = Polygon([
 
 def validate_csv(file_path):
    try:
-        # specification = Specification()
-        # mandatory_fields = specification.schema_field['conservation-area']
+        # try:
+        #     factory_obj = Factory()
+        #     dataset_specifications = factory_obj.get_specification("conservation-area") #dataset passed from frontend
+        # except KeyError:
+        #     logger.error("Dataset does not have specification defined")
         
         response = []
         statusResponse = JsonResponse()

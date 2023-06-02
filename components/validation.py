@@ -1,10 +1,10 @@
 import pandas as pd
 import os
 import json
-from application.models.validation_result import JsonResponse, JsonError
+from components.models.validation_result import JsonResponse, JsonError
 from shapely.geometry import Polygon, Point
 from shapely import wkt
-from application.logger import get_logger
+from components.logger import get_logger
 #import pdb
 #from factory import Factory
 

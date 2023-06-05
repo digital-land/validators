@@ -21,7 +21,7 @@ uk_polygon = Polygon([
 ])
 
 
-def validate_csv(file_path):
+def validate_csv(data):
    try:
         # try:
         #     factory_obj = Factory()
@@ -32,10 +32,10 @@ def validate_csv(file_path):
         response = []
         statusResponse = JsonResponse()
        
-        data = pd.read_csv(file_path,  index_col=False)
+        #data = pd.read_csv(file_path,  index_col=False)
         
         #Checking if file only contains headers
-        if data.size == 0:
+        if len(data) == 0:
             error_message = 'Error occurred while checking CSV: Only header found'
             error = JsonError(
                 scope='File',
@@ -53,12 +53,12 @@ def validate_csv(file_path):
         # missing_headers = [header for header in mandatory_fields if header not in headers]
         # print(missing_headers)
         ### Iterating over the rows
-        for index, row in data.iterrows():
+        for index, entity in enumerate(data):
             #pdb.set_trace()
 
             ## Check if the point falls within the UK geometry
             # Remove the "POINT" prefix and parentheses
-            point = row.Point.replace("POINT", "").strip()[1:-1]
+            point = entity.Point.replace("POINT", "").strip()[1:-1]
             # Split the coordinates by space
             coordinates = point.split()
             # polygon = wkt.loads(row.Geometry)
@@ -80,9 +80,12 @@ def validate_csv(file_path):
                 response.append(additional_data.to_dict())
 
             #Checking for null values    
-            missing = row.isnull().tolist()
-            if any(missing):
-                missing_columns = [column for column, is_missing in zip(data.columns, missing) if is_missing]
+            missing_columns = []
+            for column in entity.__dict__.keys():
+                field_value = getattr(entity, column)
+                if field_value is None:
+                    missing_columns.append(column)
+            if missing_columns:
                 additional_data = JsonError(
                         scope= 'Field',
                         level= 'Fatal',

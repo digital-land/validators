@@ -7,5 +7,5 @@
     "Notes" :[],
     "Point" : [],
     "End_date" :["End date"],
-    "Document_url" : ["Document URL"]
+    "Document_url" : ["Document URL", "URL"]
 }

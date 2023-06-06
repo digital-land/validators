@@ -112,7 +112,8 @@ def validate_csv(data):
                     errorCode='D001',
                     errorMessage=f"Duplicate row found for reference: {reference}",
                     url='demo',
-                    rowNumber= index+1
+                    rowNumber= index+1,
+                    columnNames= 'Reference'
                 )
                 response=additional_data.to_dict()
                 result_entity.errors.append(response)

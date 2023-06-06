@@ -23,7 +23,21 @@ uk_polygon = Polygon([
 
 
 def validate_csv(data):
-   try:
+    #Checking if file only contains headers
+    if len(data) == 0:
+        error = JsonError(
+            scope='File',
+            level='Fatal',
+            errorCode='F001',
+            errorMessage='Empty File',
+            url='demo'
+            )
+        statusResponse = JsonResponse(status='FAILED')
+        statusResponse.add_error(error.to_dict())
+        raise statusResponse
+        
+   
+    try:
         # try:
         #     factory_obj = Factory()
         #     dataset_specifications = factory_obj.get_specification("conservation-area") #dataset passed from frontend
@@ -36,22 +50,6 @@ def validate_csv(data):
         duplicate_rows = []
         reference_values = set()
        
-       
-        #Checking if file only contains headers
-        if len(data) == 0:
-            error_message = 'Error occurred while checking CSV: Only header found'
-            error = JsonError(
-                scope='File',
-                level='Fatal',
-                errorCode='F001',
-                errorMessage=error_message,
-                url='demo'
-            )
-            statusResponse = JsonResponse(status='FAILED')
-            statusResponse.add_error(error.to_dict())
-            return json.dumps(statusResponse.to_dict()), 400
-        
-
         #headers = data.columns.tolist() 
         # missing_headers = [header for header in mandatory_fields if header not in headers]
        
@@ -119,20 +117,8 @@ def validate_csv(data):
             result.append(result_entity)
 
         return result
-
-    
-   except pd.errors.EmptyDataError:
-       error = JsonError(
-          scope='File',
-          level='Fatal',
-          errorCode='F001',
-          errorMessage='Empty File',
-          url='demo'
-         )
-       statusResponse = JsonResponse(status='FAILED')
-       statusResponse.add_error(error.to_dict())
-       return json.dumps(statusResponse.to_dict()), 400
-   except Exception as e:
+       
+    except Exception as e:
          logger.error('Error occurred while checking CSV:%s', str(e))
          error_message = 'Error occurred while checking CSV'
          error = JsonError(
@@ -144,7 +130,7 @@ def validate_csv(data):
          )
          statusResponse = JsonResponse(status='FAILED')
          statusResponse.add_error(error.to_dict())
-         return json.dumps(statusResponse.to_dict()), 400
+         raise statusResponse
 
 
 

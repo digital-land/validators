@@ -1,4 +1,4 @@
-class JsonResponse:
+class JsonResponse(Exception):
     def __init__(self, status=None, errors=None):
         self.status = status
         self.errors = errors or []
@@ -14,7 +14,7 @@ class JsonResponse:
         return response
 
 
-class JsonError:
+class JsonError(Exception):
     def __init__(self, errorCode, errorMessage, scope, level, rowNumber=None, columnNames=None, url=None):
         self.errorCode = errorCode
         self.errorMessage = errorMessage

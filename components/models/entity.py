@@ -17,6 +17,9 @@ class Entity:
         self.Notes = Notes
         self.Legislation = Legislation
         self.Document_url = Document_url
+
+        self.errors = []
+
         self.load_config(CONFIG_FILE_PATH)
 
 

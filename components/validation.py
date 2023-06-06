@@ -79,23 +79,21 @@ def validate_csv(data):
                 result_entity.errors.append(response)
             
             # Checking for null values
-            missing_columns = []
             for field, value in entity.__dict__.items():
                  if value is None or value == '':
-                    missing_columns.append(field)
-           
-            if missing_columns:
-                additional_data = JsonError(
+                    additional_data = JsonError(
                     scope='Field',
                     level='Fatal',
                     errorCode='F002',
                     errorMessage='Missing Fields',
                     url='demo',
                     rowNumber=index + 1,
-                    columnNames=missing_columns
+                    columnNames=field
                 )
-                response=additional_data.to_dict()
-                result_entity.errors.append(response)
+                    response=additional_data.to_dict()
+                    result_entity.errors.append(response)
+            
+                
             
             
             # # Identify duplicate rows based on the reference column
@@ -122,37 +120,6 @@ def validate_csv(data):
 
         return result
 
-
-        
-        
-        # # Identify duplicate rows based on the reference column
-        # reference_column = data.columns[0]
-        # duplicates = data.duplicated(subset=[reference_column], keep=False)
-        
-        # # Iterate over the duplicate rows and create error responses
-        # for index, is_duplicate in enumerate(duplicates):
-        #     if is_duplicate:
-        #         duplicate_row = data.loc[index]
-        #         reference_value = duplicate_row[reference_column]
-                
-        #         error = JsonError(
-        #             scope='Row',
-        #             level='Fatal',
-        #             errorCode='D001',
-        #             errorMessage=f"Duplicate row found for reference: {reference_value}",
-        #             url='demo',
-        #             rowNumber= index+1,
-        #             columnNames=missing_columns
-        #         )
-        #         error.rowNumber = index + 1
-        #         response.append(error.to_dict())
-        
-        #Adding all responses together
-        # if entity.errors:
-        #     status_response = JsonResponse(status='FAILED')
-        #     for error in response:
-        #         status_response.add_error(error)
-        #return result
     
    except pd.errors.EmptyDataError:
        error = JsonError(

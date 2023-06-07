@@ -22,8 +22,10 @@ uk_polygon = Polygon([
 ])
 
 
-def validate_csv(data):
-    #Checking if file only contains headers
+def validate_endpoint(data):
+
+    logger.info("Validations running against uploaded file..")
+    #Checking if file is empty or only comtains header
     if len(data) == 0:
         error = JsonError(
             scope='File',
@@ -115,7 +117,7 @@ def validate_csv(data):
                 result_entity.errors.append(response)
             
             result.append(result_entity)
-
+        logger.info("Validations executed successfully.")
         return result
        
     except Exception as e:

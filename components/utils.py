@@ -3,7 +3,7 @@ import csv
 import magic
 import pandas as pd
 import os
-from main.logger import get_logger
+from components.logger import get_logger
 import tempfile
 import hashlib
 

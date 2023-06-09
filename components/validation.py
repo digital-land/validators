@@ -22,7 +22,7 @@ uk_polygon = Polygon([
 ])
 
 
-async def validate_endpoint(data):
+def validate_endpoint(data):
 
     logger.info("Validations running against uploaded file..")
     #Checking if file is empty or only comtains header

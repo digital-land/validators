@@ -22,7 +22,7 @@ uk_polygon = Polygon([
 ])
 
 
-def validate_endpoint(data):
+async def validate_endpoint(data):
 
     logger.info("Validations running against uploaded file..")
     #Checking if file is empty or only comtains header
@@ -59,11 +59,9 @@ def validate_endpoint(data):
         for index, entity in enumerate(data):
             result_entity = entity
             
-            # Check if the point falls within the UK geometry
-            point = entity.Point.replace("POINT", "").strip()[1:-1]
-            coordinates = point.split()
-            point = Point(float(coordinates[0]), float(coordinates[1]))
-            is_within_uk = uk_polygon.contains(point)
+            # Check if the geometry falls within the UK geometry
+            geometry = wkt.loads(entity.Geometry)
+            is_within_uk = uk_polygon.contains(geometry)
 
             if not is_within_uk:
                 additional_data = JsonError(

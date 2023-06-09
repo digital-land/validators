@@ -1,7 +1,7 @@
 {
     "Reference" : [],
     "Name" :[],
-    "Geometry" : [],
+    "Geometry" : ["Geometry","WKT"],
     "Start_date" :["Start date"],
     "Legislation" : [],
     "Notes" :[],

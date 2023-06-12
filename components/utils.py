@@ -6,7 +6,7 @@ import os
 from components.logger import get_logger
 import tempfile
 import hashlib
-
+import subprocess
 
 
 tmp_dir = None
@@ -102,4 +102,116 @@ def save_content(content):
         path = os.path.join(temp_dir, resource)
         with open(path, 'wb') as temp_file:
             temp_file.write(content)
-        return resource
+        return temp_file
+
+def save_contents_to_file(contents):
+    temp_dir = tempfile.mkdtemp()
+    temp_file_path = os.path.join(temp_dir, "arcgistemp")
+    try:
+        with open(temp_file_path, 'wb') as file:
+            file.write(contents)
+        print("Contents saved to", temp_file_path)
+        return temp_file_path  # Return the file path after successful save
+    except IOError as e:
+        print("Error saving contents:", str(e))
+        return None  # Return None if there was an error
+
+
+
+
+def execute(command):
+    logger.debug("execute: %s", command)
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    try:
+        outs, errs = proc.communicate(timeout=600)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        outs, errs = proc.communicate()
+
+    return proc.returncode, outs.decode("utf-8"), errs.decode("utf-8")
+
+
+def convert_features_to_csv(input_path):
+    output_path = tempfile.NamedTemporaryFile(suffix=".csv").name
+    execute(
+        [
+            "ogr2ogr",
+            "-oo",
+            "DOWNLOAD_SCHEMA=NO",
+            "-lco",
+            "GEOMETRY=AS_WKT",
+            "-lco",
+            "LINEFORMAT=CRLF",
+            "-f",
+            "CSV",
+            "-nlt",
+            "MULTIPOLYGON",
+            "-nln",
+            "MERGED",
+            "--config",
+            "OGR_WKT_PRECISION",
+            "10",
+            output_path,
+            input_path,
+        ]
+    )
+    if not os.path.isfile(output_path):
+        return None
+
+    return output_path
+
+def read_csv(input_path, encoding="utf-8"):
+    logger.debug("reading %s with encoding %s", input_path, encoding)
+    return open(input_path, encoding=encoding, newline=None)
+
+def _read_text_file( input_path, encoding, charset):
+        f = read_csv(input_path, encoding)
+        #self.log.mime_type = "text/csv" + self.charset
+        content = f.read(10)
+        f.seek(0)
+        converted_csv_file = None
+
+        if content.lower().startswith("<!doctype "):
+            #self.log.mime_type = "text/html" + self.charset
+            logger.warn("%s has <!doctype, IGNORING!", input_path)
+            f.close()
+            return None
+
+        elif content.lower().startswith(("<?xml ", "<wfs:")):
+            logger.debug("%s looks like xml", input_path)
+            #self.log.mime_type = "application/xml" + self.charset
+            converted_csv_file = convert_features_to_csv(input_path)
+            if not converted_csv_file:
+                f.close()
+                logger.warning("conversion from XML to CSV failed")
+                return None
+
+        elif content.lower().startswith("{"):
+            logger.debug("%s looks like json", input_path)
+            #self.log.mime_type = "application/json" + self.charset
+            converted_csv_file = convert_features_to_csv(input_path)
+
+        if converted_csv_file:
+            f.close()
+            reader = read_csv(converted_csv_file)
+        else:
+            reader = f
+
+        return converted_csv_file
+
+
+def detect_file_encoding(path):
+    with open(path, "rb") as f:
+        return detect_encoding(f)
+
+
+def detect_encoding(f):
+    detector = UniversalDetector()
+    detector.reset()
+    for line in f:
+        detector.feed(line)
+        if detector.done:
+            break
+    detector.close()
+    return detector.result["encoding"]

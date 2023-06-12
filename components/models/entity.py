@@ -50,6 +50,8 @@ class Entity:
                         if value in row:
                             field_value = row[value]
                             break
+                    if field_value is None:
+                        field_value = ''
                     setattr(entity, field, field_value)
                 data.append(entity)
          return data

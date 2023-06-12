@@ -2,6 +2,7 @@ import csv
 import json
 import os
 from shapely import wkt
+from shapely.geometry import Point
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_FILE_PATH = os.path.join(BASE_DIR, 'config', 'globalConfig.json')
@@ -43,7 +44,7 @@ class Entity:
                         geometry = wkt.loads(entity.Geometry)
                         centroid = geometry.centroid
                         lat, lon = centroid.x, centroid.y
-                        field_value = [(lat, lon)]
+                        field_value = Point(lat, lon)
                    
                     for value in field_values:
                         if value in row:

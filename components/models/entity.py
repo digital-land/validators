@@ -44,7 +44,7 @@ class Entity:
                         geometry = wkt.loads(entity.Geometry)
                         centroid = geometry.centroid
                         lat, lon = centroid.x, centroid.y
-                        field_value = Point(lat, lon)
+                        field_value = f"POINT({lon} {lat})"
                    
                     for value in field_values:
                         if value in row:

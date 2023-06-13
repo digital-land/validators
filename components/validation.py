@@ -101,7 +101,7 @@ def validate_endpoint(data):
             else:
                 reference_values.add(reference)
 
-            if reference_values:
+            if duplicate_rows:
                 additional_data =JsonError(
                     scope='Row',
                     level='Fatal',

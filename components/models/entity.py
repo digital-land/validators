@@ -1,6 +1,8 @@
 import csv
 import json
 import os
+from shapely import wkt
+from shapely.geometry import Point
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_FILE_PATH = os.path.join(BASE_DIR, 'config', 'globalConfig.json')
@@ -38,10 +40,18 @@ class Entity:
                     field_value = None
                     if not field_values:
                         field_value = row.get(field)
+                    if field_value is None and field == 'Point':
+                        geometry = wkt.loads(entity.Geometry)
+                        centroid = geometry.centroid
+                        lat, lon = centroid.x, centroid.y
+                        field_value = f"POINT({lon} {lat})"
+                   
                     for value in field_values:
                         if value in row:
                             field_value = row[value]
                             break
+                    if field_value is None:
+                        field_value = ''
                     setattr(entity, field, field_value)
                 data.append(entity)
          return data

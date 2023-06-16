@@ -59,11 +59,9 @@ def validate_endpoint(data):
         for index, entity in enumerate(data):
             result_entity = entity
             
-            # Check if the point falls within the UK geometry
-            point = entity.Point.replace("POINT", "").strip()[1:-1]
-            coordinates = point.split()
-            point = Point(float(coordinates[0]), float(coordinates[1]))
-            is_within_uk = uk_polygon.contains(point)
+            # Check if the geometry falls within the UK geometry
+            geometry = wkt.loads(entity.Geometry)
+            is_within_uk = uk_polygon.contains(geometry)
 
             if not is_within_uk:
                 additional_data = JsonError(
@@ -103,7 +101,7 @@ def validate_endpoint(data):
             else:
                 reference_values.add(reference)
 
-            if reference_values:
+            if duplicate_rows:
                 additional_data =JsonError(
                     scope='Row',
                     level='Fatal',

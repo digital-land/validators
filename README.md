@@ -1,13 +1,12 @@
 # validators
 Make sure that data meets the specification for the collections.
+This project is called in engagement-platform webapp to run validations against the uploaded data.
+Currently running basic validations against csv and arcgis links. 
+The start point of the application is validate_endpoint() method in components/validation.py
 
 
 # Steps to setup the project
     pip install -r requirements.txt
 
-# To run it locally, 
-    python3 main.py runserver
 
-# Use the curl command to test the endpoint /validate
-    example curl command: 
-        curl -X POST -H "Content-Type: multipart/form-data" -F "file=@validators/csv/camden_conservation_areas.csv" http://127.0.0.1:5000/validate 
+
